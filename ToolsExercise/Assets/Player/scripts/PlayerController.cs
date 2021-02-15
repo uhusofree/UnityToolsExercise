@@ -16,11 +16,11 @@ namespace UnityTools.Player
         // Update is called once per frame
         void Update()
         {
-            movementSpeed = Input.GetAxis("Horizontal") * Time.deltaTime;
-            rotationSpeed = Input.GetAxis("Vertical") * Time.deltaTime;
+            float movement = Input.GetAxis("Horizontal") * Time.deltaTime * movementSpeed;
+            float rotation = Input.GetAxis("Vertical") * Time.deltaTime * rotationSpeed;
 
-            transform.Translate(0, 0, movementSpeed);
-            transform.Rotate(0, rotationSpeed, 0); 
+            transform.Translate(0, 0, movement);
+            transform.Rotate(0, rotation, 0);
         }
     }
 
