@@ -49,8 +49,14 @@ namespace UnityTools.Cam
             targetCam.height = Mathf.Clamp(targetCam.height, 10f, float.MaxValue);
             targetCam.height = Handles.ScaleSlider(targetCam.height, camTranform.position, Vector3.up, Quaternion.identity, targetCam.height, 1f);
 
-            Handles.Label(camTranform.position + (-camTranform.forward * targetCam.dist), "Distance");
-            Handles.Label(camTranform.position + (Vector3.up * targetCam.height), "Height");
+
+            GUIStyle handlesStyle = new GUIStyle();
+            handlesStyle.fontSize = 12;
+            handlesStyle.alignment = TextAnchor.MiddleCenter;
+            handlesStyle.normal.textColor = Color.black;
+
+            Handles.Label(camTranform.position + (-camTranform.forward * targetCam.dist), "Distance", handlesStyle);
+            Handles.Label(camTranform.position + (Vector3.up * targetCam.height), "Height", handlesStyle);
 
         }
 
