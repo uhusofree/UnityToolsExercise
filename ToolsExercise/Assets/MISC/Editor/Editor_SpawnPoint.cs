@@ -46,7 +46,7 @@ namespace UnityTools.SpawnPoint
         private void GenerateRandomPoints()
 
         {
-            float diameter = radius * radius;
+            float diameter = 2 * radius;
             float circumfernce = Mathf.PI * diameter;
             float xRef = 0f;
             float yRef = 0f;
@@ -54,7 +54,7 @@ namespace UnityTools.SpawnPoint
             pointsOnLine = new Vector2[spawnerCount];
             for (int i = 0; i < spawnerCount; i++)
             {
-                //pointsOnLine[i] += new Vector2(circumfernce, yRef);
+                //pointsOnLine[i] += new Vector2(xRef, yRef);
                 pointsOnLine[i] += Vector2.ClampMagnitude(new Vector2(xRef - radius * .5f, yRef - radius * .5f), diameter);
                 //pointsOnLine[i] += new Vector2(xRef - radius * .5f, yRef - radius * .5f);
                 xRef += 1;
@@ -95,13 +95,15 @@ namespace UnityTools.SpawnPoint
                 GenerateRandomPoints();
                 SceneView.RepaintAll();
             }
-            Repaint();
 
             EditorGUILayout.LabelField("Select or Drag in Spawn Prefab ", EditorStyles.helpBox);
 
             spSpawnPoint.FindPropertyRelative("spawnPoint");
-            spawnPoint = (GameObject)EditorGUILayout.ObjectField("Spawn Point",spawnPoint ,typeof(GameObject), true);
+            spawnPoint = (GameObject)EditorGUILayout.ObjectField("Spawn Point", spawnPoint, typeof(GameObject), true);
+
             Repaint();
+
+
 
             //click out field focus
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
@@ -114,6 +116,7 @@ namespace UnityTools.SpawnPoint
         public void RunDuringSceneGUI(SceneView sceneView)
         {
             //var t = Matrix4x4.TRS(Vector2.zero, Quaternion.LookRotation(Vector2.right), Vector2.one);
+
             Transform camTransform = sceneView.camera.transform;
 
             if (Event.current.type == EventType.MouseMove)
@@ -140,6 +143,8 @@ namespace UnityTools.SpawnPoint
 
                 foreach (var point in pointsOnLine)
                 {
+                    Vector3 pointOffset = new Vector3(0, .5f);/**offset from ground*/
+
                     Vector3 worldPos = hit.point + (tangent * point.x + biTangent * point.y) * radius;
                     worldPos += hitNormal * 2;
                     Vector3 rayDir = -hitNormal;
@@ -148,12 +153,11 @@ namespace UnityTools.SpawnPoint
                     if (Physics.Raycast(pointsRay, out RaycastHit pointHit))
                     {
                         DrawPointsInToolSphere(pointHit.point);
-                    }
 
-                    if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
-                    {
-                        Instantiate(spawnPoint);
-                        Debug.Log("clicked");
+                        if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+                        {
+                            Instantiate(spawnPoint, pointHit.point + pointOffset, Quaternion.identity);
+                        }
                     }
 
                 }

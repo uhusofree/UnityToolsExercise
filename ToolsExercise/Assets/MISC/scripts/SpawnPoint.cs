@@ -20,7 +20,7 @@ namespace UnityTools.SpawnPoint
         {
             if (spawnCount < 1)
             {
-                Instantiate(spawnObject, transform.position, Quaternion.identity);
+                Instantiate(spawnObject,  transform.position, Quaternion.identity); ;
                 spawnCount++;
             }
             else
