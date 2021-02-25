@@ -17,7 +17,7 @@ namespace UnityTools.SpawnPoint
         SerializedObject so;
         SerializedProperty spRadius;
         SerializedProperty spSpawnerCount;
-        SerializedProperty spPointsOnLine;
+        //SerializedProperty spPointsOnLine;
         SerializedProperty spSpawnPoint;
 
         public static void LaunchWindow()
@@ -31,10 +31,10 @@ namespace UnityTools.SpawnPoint
             so = new SerializedObject(this);
             spRadius = so.FindProperty("radius");
             spSpawnerCount = so.FindProperty("spawnerCount");
-            spPointsOnLine = so.FindProperty("pointsOnLine");
+            //spPointsOnLine = so.FindProperty("pointsOnLine");
             spSpawnPoint = so.FindProperty("spawnPoint");
 
-            GenerateRandomPoints();
+            GeneratePointsOnLine();
             SceneView.duringSceneGui += RunDuringSceneGUI;
         }
 
@@ -43,25 +43,20 @@ namespace UnityTools.SpawnPoint
             SceneView.duringSceneGui -= RunDuringSceneGUI;
         }
 
-        private void GenerateRandomPoints()
+        private void GeneratePointsOnLine()
 
         {
             float diameter = 2 * radius;
-            float circumfernce = Mathf.PI * diameter;
-            float xRef = 0f;
+            float xRef = 1f;
             float yRef = 0f;
 
             pointsOnLine = new Vector2[spawnerCount];
             for (int i = 0; i < spawnerCount; i++)
             {
-                //pointsOnLine[i] += new Vector2(xRef, yRef);
-                pointsOnLine[i] += Vector2.ClampMagnitude(new Vector2(xRef - radius * .5f, yRef - radius * .5f), diameter);
-                //pointsOnLine[i] += new Vector2(xRef - radius * .5f, yRef - radius * .5f);
+                pointsOnLine[i] += Vector2.ClampMagnitude(new Vector2(xRef - radius * .5f, 1f/*yRef - radius * .5f*/), diameter);
+
                 xRef += 1;
                 yRef += 1;
-
-                //Debug.Log(pointsOnLine[i].x + " " + pointsOnLine[i].y);
-
 
                 /**float xRand = 1;
                  float yRand = 1;
@@ -81,7 +76,7 @@ namespace UnityTools.SpawnPoint
         {
             so.Update();
             EditorGUILayout.LabelField("Spawn Point Tool", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("adjust radius to increase offsets between spawn points", EditorStyles.helpBox);
+            EditorGUILayout.LabelField("adjust to increase offsets between spawn points", EditorStyles.helpBox);
 
             spRadius.floatValue = Mathf.Max(1, spRadius.floatValue);
             EditorGUILayout.PropertyField(spRadius);
@@ -92,7 +87,7 @@ namespace UnityTools.SpawnPoint
             EditorGUILayout.PropertyField(spSpawnerCount);
             if (so.ApplyModifiedProperties())
             {
-                GenerateRandomPoints();
+                GeneratePointsOnLine();
                 SceneView.RepaintAll();
             }
 
@@ -115,7 +110,6 @@ namespace UnityTools.SpawnPoint
 
         public void RunDuringSceneGUI(SceneView sceneView)
         {
-            //var t = Matrix4x4.TRS(Vector2.zero, Quaternion.LookRotation(Vector2.right), Vector2.one);
 
             Transform camTransform = sceneView.camera.transform;
 
@@ -135,6 +129,7 @@ namespace UnityTools.SpawnPoint
 
             //ray from mouse position
             Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 Vector3 hitNormal = hit.normal;
@@ -154,22 +149,45 @@ namespace UnityTools.SpawnPoint
                     {
                         DrawPointsInToolSphere(pointHit.point);
 
+
                         if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
                         {
-                            Instantiate(spawnPoint, pointHit.point + pointOffset, Quaternion.identity);
+                            if (spawnPoint == null)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                               
+                                Instantiate(spawnPoint, pointHit.point + pointOffset, Quaternion.identity);
+                                
+                            }
+
+
                         }
                     }
-
                 }
 
-                Handles.color = new Color(0f, 0f, 1f, 1f);
-                Handles.DrawAAPolyLine(10f, hit.point, hit.point + hit.normal);
-                Handles.color = new Color(1f, 0f, 0f, 1f);
-                Handles.DrawAAPolyLine(10f, hit.point, hit.point + tangent);
-                Handles.color = new Color(0f, 1f, 0f, 1f);
-                Handles.DrawAAPolyLine(10f, hit.point, hit.point + biTangent);
-                Handles.color = Color.white;
-                Handles.DrawWireDisc(hit.point, hit.normal, radius);
+
+                Vector3 worldPos1 = hit.point + (tangent + biTangent) * radius;
+                GUIStyle labelStyle = new GUIStyle();
+                labelStyle.fontSize = 12;
+                labelStyle.alignment = TextAnchor.MiddleCenter;
+                labelStyle.normal.textColor = Color.black;
+
+                Handles.Label(worldPos1, "Spawn Point Placer", labelStyle);
+
+
+
+                /** HANDLE HHELPER FOR VISUALIZATION
+                 * Handles.color = new Color(0f, 0f, 1f, 1f);
+                //Handles.DrawAAPolyLine(10f, hit.point, hit.point + hit.normal);
+                //Handles.color = new Color(1f, 0f, 0f, 1f);
+                //Handles.DrawAAPolyLine(10f, hit.point, hit.point + tangent);
+                //Handles.color = new Color(0f, 1f, 0f, 1f);
+                //Handles.DrawAAPolyLine(10f, hit.point, hit.point + biTangent);
+                //Handles.color = Color.white;
+                //Handles.DrawWireDisc(hit.point, hit.normal, radius);*/
             }
         }
 
