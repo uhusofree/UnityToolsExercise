@@ -5,32 +5,53 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Movement : MonoBehaviour
 {
-    
+
 
 
     [SerializeField] float speed = 10f;
     [SerializeField] float tiltAngle = 50f;
     [SerializeField] float smooth = 10f;
-    
-    Vector3 targetPos;
+    [SerializeField] float radius = 10f;
+
+    public Transform targetPos;
     Position pos;
+    Rigidbody rb;
 
     private void Start()
     {
-        targetPos = pos.GetPosition();
+        rb = GetComponent<Rigidbody>();
     }
 
     private void Update()
     {
         //move to targeting function
-        float turnX = targetPos.x * tiltAngle;
-        float turnZ = targetPos.z * tiltAngle;
-        Quaternion target = Quaternion.Euler(turnX, 0, turnZ);
-        transform.rotation = Quaternion.Slerp(transform.rotation, target, smooth * Time.deltaTime);
+        //
 
-        transform.position += Vector3.forward  * speed * Time.deltaTime;
-        //transform.position += new Vector3(speed * Time.deltaTime, 0, 0);
+        targetPos.position = GameObject.FindObjectOfType<Position>().transform.position;
+
+        if (Vector3.Distance(transform.position, targetPos.position) < radius)
+        {
+            Vector3 targetDirection = targetPos.position - transform.position;
+
+            float singleStep = tiltAngle * Time.deltaTime;
+            Vector3 newDirection = Vector3.RotateTowards(transform.forward, targetDirection, singleStep, 0.0f);
+
+            Debug.DrawRay(transform.position, newDirection, Color.red);
+            transform.rotation = Quaternion.LookRotation(newDirection);
+        }
+        else
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+
+
+
+
+        //transform.position += Vector3.forward * speed * Time.deltaTime;
     }
 
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.black;
+        Gizmos.DrawWireSphere(transform.position, radius);
+    }
 }

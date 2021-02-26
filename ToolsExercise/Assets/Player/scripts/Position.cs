@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Position : MonoBehaviour
 {
-    public Vector3 GetPosition()
+    public Vector3 GetPosition
     {
-        return this.transform.position;
+        get { return this.transform.position; }
     }
 }
