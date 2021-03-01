@@ -126,11 +126,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8084736ff572ba741b9aaa4c5f4a89c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0.5
+  speed: 1.58
   tiltAngle: 50
   smooth: 0.5
   radius: 14.69
   targetPos: {fileID: 8651105004781190309, guid: 2f4a0d7459cbabf4faf65f01395967e0, type: 3}
+  wayPoint: {fileID: 4570794977994734983, guid: bae9c692cbccfca42b4d9ebe43e80fd6, type: 3}
 --- !u!1 &6352833819565909385
 GameObject:
   m_ObjectHideFlags: 0

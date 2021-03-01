@@ -14,6 +14,7 @@ public class Movement : MonoBehaviour
     [SerializeField] float radius = 10f;
 
     public Transform targetPos;
+    public Transform wayPoint;
     Position pos;
     Rigidbody rb;
 
@@ -25,7 +26,6 @@ public class Movement : MonoBehaviour
     private void Update()
     {
         //move to targeting function
-        //
 
         targetPos.position = GameObject.FindObjectOfType<Position>().transform.position;
 
@@ -40,7 +40,14 @@ public class Movement : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(newDirection);
         }
         else
-        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        {
+            //float moveDeltaTime = speed * Time.deltaTime;
+            //transform.position = Vector3.MoveTowards(transform.position, wayPoint.position, moveDeltaTime);
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        }
+
+
+
 
 
 
