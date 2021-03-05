@@ -8,7 +8,7 @@ namespace UnityTools.SpawnPoint
 {
     public class Menu_SpawnPoint
     {
-        [MenuItem("Uhuru Tool/Spawner Placer")]
+        [MenuItem("Uhuru's Tool/Object Placer")]
 
         public static void PlaceSpawnPoint()
         {

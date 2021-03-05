@@ -8,15 +8,15 @@ namespace UnityTools.SpawnPoint
 {
     public class Editor_SpawnPoint : EditorWindow
     {
-        public float radius = 2f;
-        public int spawnerCount = 5;
+        public float offset = 2f;
+        public int objectCount = 5;
 
         public GameObject spawnPoint;
         private Vector2[] pointsOnLine;
 
         SerializedObject so;
-        SerializedProperty spRadius;
-        SerializedProperty spSpawnerCount;
+        SerializedProperty spOffset;
+        SerializedProperty spObjectCount;
         //SerializedProperty spPointsOnLine;
         SerializedProperty spSpawnPoint;
 
@@ -29,8 +29,8 @@ namespace UnityTools.SpawnPoint
         private void OnEnable()
         {
             so = new SerializedObject(this);
-            spRadius = so.FindProperty("radius");
-            spSpawnerCount = so.FindProperty("spawnerCount");
+            spOffset = so.FindProperty("offset");
+            spObjectCount = so.FindProperty("objectCount");
             //spPointsOnLine = so.FindProperty("pointsOnLine");
             spSpawnPoint = so.FindProperty("spawnPoint");
 
@@ -46,14 +46,14 @@ namespace UnityTools.SpawnPoint
         private void GeneratePointsOnLine()
 
         {
-            float diameter = 2 * radius;
+            float diameter = 2 * offset;
             float xRef = 1f;
             float yRef = 0f;
 
-            pointsOnLine = new Vector2[spawnerCount];
-            for (int i = 0; i < spawnerCount; i++)
+            pointsOnLine = new Vector2[objectCount];
+            for (int i = 0; i < objectCount; i++)
             {
-                pointsOnLine[i] += Vector2.ClampMagnitude(new Vector2(xRef - radius * .5f, 1f/*yRef - radius * .5f*/), diameter);
+                pointsOnLine[i] += Vector2.ClampMagnitude(new Vector2(xRef - offset * .5f, 1f/*yRef - radius * .5f*/), diameter);
 
                 xRef += 1;
                 yRef += 1;
@@ -75,26 +75,26 @@ namespace UnityTools.SpawnPoint
         private void OnGUI()
         {
             so.Update();
-            EditorGUILayout.LabelField("Spawn Point Tool", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField("adjust to increase offsets between spawn points", EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Object Placer Tool", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("adjust to increase offsets between objects", EditorStyles.helpBox);
 
-            spRadius.floatValue = Mathf.Max(1, spRadius.floatValue);
-            EditorGUILayout.PropertyField(spRadius);
+            spOffset.floatValue = Mathf.Max(1, spOffset.floatValue);
+            EditorGUILayout.PropertyField(spOffset);
 
-            spSpawnerCount.intValue = Mathf.Max(1, spSpawnerCount.intValue);
-            spSpawnerCount.intValue = Mathf.Min(5, spSpawnerCount.intValue);
+            spObjectCount.intValue = Mathf.Max(1, spObjectCount.intValue);
+            spObjectCount.intValue = Mathf.Min(5, spObjectCount.intValue);
 
-            EditorGUILayout.PropertyField(spSpawnerCount);
+            EditorGUILayout.PropertyField(spObjectCount);
             if (so.ApplyModifiedProperties())
             {
                 GeneratePointsOnLine();
                 SceneView.RepaintAll();
             }
 
-            EditorGUILayout.LabelField("Select or Drag in Spawn Prefab ", EditorStyles.helpBox);
+            EditorGUILayout.LabelField("Select or Drag in Object Prefab ", EditorStyles.helpBox);
 
             spSpawnPoint.FindPropertyRelative("spawnPoint");
-            spawnPoint = (GameObject)EditorGUILayout.ObjectField("Spawn Point", spawnPoint, typeof(GameObject), true);
+            spawnPoint = (GameObject)EditorGUILayout.ObjectField("Placeable Object", spawnPoint, typeof(GameObject), true);
 
             Repaint();
 
@@ -138,9 +138,7 @@ namespace UnityTools.SpawnPoint
 
                 foreach (var point in pointsOnLine)
                 {
-                    Vector3 pointOffset = new Vector3(0, .5f);/**offset from ground*/
-
-                    Vector3 worldPos = hit.point + (tangent * point.x + biTangent * point.y) * radius;
+                    Vector3 worldPos = hit.point + (tangent * point.x + biTangent * point.y) * offset;
                     worldPos += hitNormal * 2;
                     Vector3 rayDir = -hitNormal;
                     Ray pointsRay = new Ray(worldPos, rayDir);
@@ -159,23 +157,21 @@ namespace UnityTools.SpawnPoint
                             else
                             {
                                
-                                Instantiate(spawnPoint, pointHit.point + pointOffset, Quaternion.identity);
+                                Instantiate(spawnPoint, pointHit.point, Quaternion.identity);
                                 
                             }
-
-
                         }
                     }
                 }
 
 
-                Vector3 worldPos1 = hit.point + (tangent + biTangent) * radius;
+                Vector3 cursorPos = hit.point + (tangent + biTangent) * offset;
                 GUIStyle labelStyle = new GUIStyle();
                 labelStyle.fontSize = 12;
                 labelStyle.alignment = TextAnchor.MiddleCenter;
                 labelStyle.normal.textColor = Color.black;
 
-                Handles.Label(worldPos1, "Spawn Point Placer", labelStyle);
+                Handles.Label(cursorPos, "Object Placer", labelStyle);
 
 
 
